@@ -118,4 +118,31 @@ class MatGraphTest {
         var rg = graph.genRandGraph(4, 8);
         System.out.println(rg.toMatGraph());
     }
+
+    @Test
+    void timedDFS() {
+        var graph = new MatGraph(3);
+        graph.addEdge(0,1, 1);
+        graph.addEdge(0, 2, 1);
+        graph.addEdge(1, 2, 1);
+
+        var c =  Graphs.timedDepthFirstSearch(graph, 0);
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < graph.numberOfVertices(); j++) {
+                System.out.println(c[0][j]);
+            }
+        }
+    }
+    @Test
+    void topoSort() {
+        var g = new MatGraph(6);
+        g.addEdge(0, 1,1);
+        g.addEdge(1, 3,1);
+        g.addEdge(1,5,1);
+        g.addEdge(3,2,1);
+        g.addEdge(2,4,1);
+        g.addEdge(5, 4, 1);
+
+        System.out.println(Graphs.topologicalSort(g, false));
+    }
 }
