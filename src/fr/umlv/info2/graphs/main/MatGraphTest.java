@@ -3,10 +3,14 @@ package fr.umlv.info2.graphs.main;
 import fr.umlv.info2.graphs.classes.AdjGraph;
 import fr.umlv.info2.graphs.classes.MatGraph;
 import fr.umlv.info2.graphs.utils.Edge;
+import fr.umlv.info2.graphs.utils.Graph;
 import fr.umlv.info2.graphs.utils.Graphs;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -94,20 +98,25 @@ class MatGraphTest {
 
     @Test
     void dfs() {
-        var graph = new MatGraph(4);
+        var graph = new MatGraph(7);
         graph.addEdge(0,1, 1);
         graph.addEdge(0, 2, 1);
-        graph.addEdge(3, 1, 1);
+        graph.addEdge(1, 2, 1);
+        graph.addEdge(2, 3,1);
         graph.addEdge(3, 2, 1);
+        graph.addEdge(4, 3, 1);
+        graph.addEdge(4,  5,1);
+        graph.addEdge(6, 5, 1);
+        graph.addEdge(6, 4, 1);
 
-      // System.out.println(graph.toGraphviz());
-        System.out.println(Graphs.DFS(graph, 0));
+      //System.out.println(graph.toGraphviz());
+        boolean [] v = new boolean[graph.numberOfVertices()];
+        System.out.println(Graphs.DFS(graph, 0,v));
     }
 
     @Test
     void randGraph() {
         var graph = new MatGraph(4);
-
         var rg = graph.genRandGraph(4,8);
         System.out.println(rg.toGraphviz());
     }
@@ -121,28 +130,57 @@ class MatGraphTest {
 
     @Test
     void timedDFS() {
-        var graph = new MatGraph(3);
+        var graph = new MatGraph(7);
         graph.addEdge(0,1, 1);
         graph.addEdge(0, 2, 1);
         graph.addEdge(1, 2, 1);
+        graph.addEdge(2, 3,1);
+        graph.addEdge(3, 2, 1);
+        graph.addEdge(4, 3, 1);
+        graph.addEdge(4,  5,1);
+        graph.addEdge(6, 5, 1);
+        graph.addEdge(6, 4, 1);
 
-        var c =  Graphs.timedDepthFirstSearch(graph, 0);
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < graph.numberOfVertices(); j++) {
-                System.out.println(c[0][j]);
-            }
-        }
+        System.out.println(Graphs.topologicalSort(graph,false));
+
+
     }
     @Test
     void topoSort() {
         var g = new MatGraph(6);
-        g.addEdge(0, 1,1);
-        g.addEdge(1, 3,1);
-        g.addEdge(1,5,1);
-        g.addEdge(3,2,1);
-        g.addEdge(2,4,1);
-        g.addEdge(5, 4, 1);
+        g.addEdge(0, 1, 1);
+        g.addEdge(1, 2, 1);
+        g.addEdge(1, 3, 1);
+        g.addEdge(1, 4, 1);
+        g.addEdge(3, 4, 1);
+        g.addEdge(4, 3, 1);
+        g.addEdge(4, 5, 1);
+        g.addEdge(2, 5, 1);
+        g.addEdge(5, 2, 1);
+        g.addEdge(3, 1, 1);
+        g.addEdge(3, 0, 1);
+        var c =  Graphs.timedDepthFirstSearch(g, 0);
 
-        System.out.println(Graphs.topologicalSort(g, false));
+
+        for (int j = 0; j < g.numberOfVertices(); j++) {
+                System.out.println(c[1][j]);
+        }
+
+        System.out.println(Graphs.scc(g));
+
+    }
+
+    @Test
+    void topoSort2() {
+        var g = new MatGraph(5);
+        g.addEdge(0, 2, 1);
+        g.addEdge(0, 3, 1);
+        g.addEdge(1, 0, 1);
+        g.addEdge(2, 1, 1);
+        g.addEdge(3, 4, 1);
+
+
+        System.out.println(Graphs.scc(g));
+
     }
 }
