@@ -114,7 +114,7 @@ class MatGraphTest {
         System.out.println(Graphs.DFS(graph, 0,v));
     }
 
-    @Test
+   /* @Test
     void randGraph() {
         var graph = new MatGraph(4);
         var rg = graph.genRandGraph(4,8);
@@ -126,7 +126,7 @@ class MatGraphTest {
         var graph = new MatGraph(4);
         var rg = graph.genRandGraph(4, 8);
         System.out.println(rg.toMatGraph());
-    }
+    }*/
 
     @Test
     void timedDFS() {
@@ -181,6 +181,58 @@ class MatGraphTest {
 
 
         System.out.println(Graphs.scc(g));
+
+    }
+
+    @Test
+    void test() {
+
+
+        var g = new AdjGraph(5);
+        g.addEdge(0,1, 2);
+        g.addEdge(0,2,-1);
+        g.addEdge(2, 4,2);
+        g.addEdge(1, 3,3);
+        g.addEdge(3, 4, 1);
+        g.addEdge(4,1, 0);
+        g.addEdge(1,2,1);
+
+        Graphs.bellmanFord(g, 0).printShortestPathTo(4);
+
+    }
+
+    @Test
+    void test2() {
+        var g = new AdjGraph(5);
+        g.addEdge(0,1, 2);
+        g.addEdge(0,2,5);
+        g.addEdge(2, 4,2);
+        g.addEdge(1, 3,1);
+        g.addEdge(3, 4, 6);
+        g.addEdge(4,1, 1);
+        g.addEdge(1,2,2);
+
+        System.out.println(Graphs.dijkstra(g,0));
+
+    }
+
+
+
+    @Test
+    void test3() {
+
+
+        var g = new AdjGraph(4);
+        g.addEdge(0, 1, 3);
+        g.addEdge(0,2, 2);
+        g.addEdge(2,1, 1);
+
+        g.addEdge(2,3, 4);
+        g.addEdge(1,3, 3);
+
+        g.addEdge(2,1, -1);
+
+        System.out.println(Graphs.floydWarshall(g));
 
     }
 }

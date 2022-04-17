@@ -52,7 +52,7 @@ public class MatGraph implements Graph {
         return mat[i][j] ;
     }
 
-    @Override
+   /* @Override
     public Iterator<Edge> edgeIterator(int i) {
         return new Iterator<>() {
             private int index = computeNext(0);
@@ -79,7 +79,15 @@ public class MatGraph implements Graph {
                 return new Edge(i, temp, mat[i][temp]);
             }
         };
-    }
+    }*/
+   @Override
+   public Iterator<Edge> edgeIterator(int i) {
+       Objects.checkIndex(i, n);
+       return IntStream.range(0, n) // Iterate over the neighbors
+               .mapToObj(j -> new Edge(i, j, mat[i][j])) // for every neighbors, change them for an edge
+               .filter(edge -> edge.getValue() != 0) // filter out the edge with null value
+               .iterator();
+   }
 
     @Override
     public void forEachEdge(int i, Consumer<Edge> consumer) {
@@ -144,14 +152,4 @@ public class MatGraph implements Graph {
         return random.nextInt(max - min) + min;
     }
 
-    public static void main(String[] args) {
-
-        var graph = new MatGraph(3);
-        graph.addEdge(0,1, 1);
-        graph.addEdge(1, 2, 1);
-        graph.addEdge(2, 0, 1);
-        graph.addEdge(2, 1, 1);
-
-        System.out.println(graph.toGraphviz());
-    }
 }

@@ -90,10 +90,5 @@ class AdjGraphTest {
                 }""", graph.toGraphviz());
     }
 
-    @Test
-    void toMat(){
-        var g = createNewGraph();
-        var rg = g.genRandGraph(4, 8);
-        System.out.println(rg.toMatGraph());
-    }
+
 }

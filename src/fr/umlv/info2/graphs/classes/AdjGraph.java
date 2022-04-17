@@ -8,24 +8,21 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 public class AdjGraph implements Graph {
-private int numberOdEdges ;
-private final ArrayList<LinkedList<Edge>> adj ;
-private final int n; // number of vertices
+    private final ArrayList<LinkedList<Edge>> adj;
+    private final int n; // number of vertices
+    private int m; // number of edges;
 
     public AdjGraph(int n) {
         this.n = n;
-        this.adj = new ArrayList<>();
-       IntStream.range(0, n).forEach(i -> {
-            adj.add(i, new LinkedList<>());
-           for (int j = 0; j < n; j++) {
-               adj.get(i).add(new Edge(i, j,0));
-           }
-        });
+        this.adj = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            adj.add(new LinkedList<Edge>());
+        }
     }
 
     @Override
     public int numberOfEdges() {
-        return numberOdEdges;
+        return m;
     }
 
     @Override
@@ -35,48 +32,36 @@ private final int n; // number of vertices
 
     @Override
     public void addEdge(int i, int j, int value) {
-        if(checkIndex(i,j))
-            throw new IndexOutOfBoundsException();
-        adj.get(i).set(j, new Edge(i, j, value));
-        numberOdEdges++;
+        var linkedList = adj.get(i);
+        var newEdge = new Edge(i, j, value);
+        linkedList.add(newEdge);
+        m++;
     }
-
-    private boolean checkIndex(int i, int j ) {
-        return  i > n || j > n;
-    }
-
 
     @Override
     public boolean isEdge(int i, int j) {
-        for (var e = edgeIterator(i);e.hasNext();) {
-            var c = e.next();
-            if( c.getEnd() == j) {
-                return true;
-            }
-        }
-        return false;
-
+        return adj.get(i).stream().anyMatch(edge -> edge.getEnd() == j);
     }
 
     @Override
     public int getWeight(int i, int j) {
-        if(checkIndex(i,j))
-            throw new IndexOutOfBoundsException();
-        if(!isEdge(i,j))
-            throw new NoSuchElementException();
-
-        return adj.get(i).get(j).getValue();
+        var edge = adj.get(i).stream().filter(e -> e.getEnd() == j).findFirst();
+        if (edge.isEmpty()) {
+            throw new IllegalArgumentException("Tried to get the weight of a non added edge");
+        }
+        return edge.get().getValue();
     }
 
     @Override
     public Iterator<Edge> edgeIterator(int i) {
-        return adj.get(i).stream().filter(edge -> edge.getValue() != 0).iterator();
+        return adj.get(i).iterator();
     }
 
     @Override
     public void forEachEdge(int i, Consumer<Edge> consumer) {
-        edgeIterator(i).forEachRemaining(consumer);
+        adj.get(i).forEach(consumer);
     }
+
 
     @Override
     public String toGraphviz() {
@@ -106,37 +91,44 @@ private final int n; // number of vertices
         return g;
     }
 
-    public String toMatGraph() {
-        var stringBuilder = new StringBuilder();
-        stringBuilder.append(n).append("\n");
-
-        IntStream.range(0, n).forEach(i -> {
-            adj.get(i).forEach(e -> {
-                if(e.getValue() == 0) {
-                   stringBuilder.append("0").append(" ");
-                } else {
-                    stringBuilder.append(e.getEnd()).append(" ");
-                }
-            });
-            stringBuilder.append("\n");
-        });
-
-        return stringBuilder.toString();
-    }
-
-
     public int getRandomNumberUsingNextInt(int min, int max) {
         Random random = new Random();
         return random.nextInt(max - min) + min;
     }
 
-    public static void main(String[] args) {
-        var graphAdj = new AdjGraph(3);
-        graphAdj.addEdge(0, 1, 4);
-        graphAdj.addEdge(1,2,3);
-        graphAdj.addEdge(2, 0, 3);
-        graphAdj.addEdge(2,1,6);
 
-        System.out.println(graphAdj.toGraphviz());
+    @Override
+    public Graph transpose() {
+        var newGraph = new AdjGraph(n);
+
+        for(int i = 0; i < n; i++){
+            this.forEachEdge(i, edge -> newGraph.addEdge(edge.getEnd(), edge.getStart(), edge.getValue()));
+        }
+
+        return newGraph;
+    }
+
+    private boolean adjEquals(AdjGraph graph, AdjGraph other){
+        var arrayEquals = graph.adj.equals(other.adj);
+        if(!arrayEquals){
+            return false;
+        }
+        for(int i = 0; i < n; i++){
+            if(graph.adj.get(i).equals(other.adj.get(i))){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof AdjGraph adjGraph && n == adjGraph.n && m == adjGraph.m && this.adjEquals(this, adjGraph);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(adj, n, m);
     }
 }
